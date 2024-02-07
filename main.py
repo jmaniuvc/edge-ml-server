@@ -8,7 +8,7 @@ from langchain_openai import ChatOpenAI
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
-os.environ['OPENAI_API_KEY'] = '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'
+openai_api_key = os.getenv('OPENAI_API_KEY')
 
 prompt_1 = """
     받은 텍스트를 action, condition 키를 가진 해야할 일, 조건으로 나눠서
