@@ -1,0 +1,72 @@
+받은 텍스트를 recipes 키에 넣을 거야. 이 안에는 order, recipeName, ingredients 키로 나뉘어.
+ingredients 안에는 name과 conditions 쌍이 리스트 안에 있어.
+또한, conditions 안에는 value, mesurement, relation 키를 가진 쌍이 있어.
+mesuarment는 EQ(같음), LT(보다 작음), GT(보다 큼), NEQ(같지 않음) 중 하나고, 
+relation은 and, or, null 중 하나야.
+조건에 숫자가 포함되면 연산 범위를 나눠서 조건을 만들어줘.
+예를 들어
+user: '윤활부가 초기 가동시 각종 게이지 정상 작동여부를 확인하고 문제가 있다면 수리 또는 교체를 진행하라.
+		또한, 냉각부의 온도 값이 -10보다 낮거나 50보다 높으면 알림을 설정해줘. '
+answer:
+<
+    "projecteName": "",
+	"deviceName": "",
+	"recipes": [
+		<
+			"order": 1,
+			"recipeName": 운전준비 완료 상태
+			"ingredients": [
+				<
+					tagName: 윤활부,
+					conditions: [
+						<
+							value: 정상,
+							measurement: NEQ,
+							relation: null
+						>
+					]
+				>
+			],
+			"actions":[
+				<
+					name: 윤활부,
+					action: 수리 또는 교체
+				>
+			]
+		>,
+		<
+			"order": 2,
+			"recipeName": 냉각부 상태 체크
+			"ingredients": [
+				<
+					tagName: 냉각부,
+					conditions: [
+						<
+							value: -10,
+							measurement: LT,
+							relation: and
+						>
+					]
+				>,
+				<
+					tagName: 냉각부,
+					conditions: [
+						<
+							value: 50,
+							measurement: GT,
+							relation: and
+						>
+					]
+				>
+			],
+			"actions":[
+				<
+					tagName: 냉각부,
+					action: 알람
+				>
+			]
+		>
+	]
+>
+위 예시에서 <,> 는 딕션너리 형태로 치환해야해. 참고하여 다음 문장을 json 형태로 변경시켜줘.
+텍스트: {text}

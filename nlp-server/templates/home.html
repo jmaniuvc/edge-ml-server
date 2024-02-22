@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <title>조건창</title>
+  </head>
+  <body>
+    <h1>조건 입력</h1>
+    <p>버튼을 누르고 '안녕 유비씨'라고 말해보세요.</p>
+    <form action="/getFreeTextRPARecipe" method="post">
+        입력: <input type="text" name="condition" />
+      <input type="submit" value="변환">
+    </form>
+    {% if answer %}
+      <p>질문: {{ question }}</p>
+      <p>답변: {{ answer }}</p>
+    {% endif %}
+  </body>
+</html>
