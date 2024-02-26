@@ -1,16 +1,15 @@
-from fastapi import FastAPI, Request, Body
-from fastapi.responses import JSONResponse
+import os
 import uvicorn
 from typing import Annotated
 import pandas as pd
-import json
-from joblib import load
 from dotenv import load_dotenv
-import os
-from utils.mqtt_send_anomaly_data import public_message
+from fastapi import FastAPI, Request, Body
+from fastapi.responses import JSONResponse
+
+from utils.inference import detect_anomaly_data
 from pydantic_models.schemas.realtime_data_schema import RealTimeRequestBody
 from pydantic_models.examples.realtime_data_example import realtime_data_exam
-#from exception.base_exception import InvalidDataException
+from exception.base_exception import InvalidDataException
 
 
 DESCRIPTION = """
@@ -37,33 +36,8 @@ app = FastAPI(
         },
     )
 
-
-
 load_dotenv()
 SAVE_DIR = os.getenv('RESOURCE_PATH')
-
-
-def detect_anomaly_data(df):
-    model = load(f'{SAVE_DIR}/dbscan.pkl')
-    scaler = load(f'{SAVE_DIR}/scaler.joblib')
-    onehot = load(f'{SAVE_DIR}/onehot_encoder.joblib')
-    dim_reduction = load(f'{SAVE_DIR}/dime_reduction.joblib')
-    with open(f'{SAVE_DIR}/meta_info.json', 'r', encoding='UTF-8') as f:
-        meta = json.load(f)
-    ###
-    category_data_encoded = onehot.fit_transform(df[meta['categorical']])
-    category_df = pd.DataFrame(category_data_encoded, columns=onehot.get_feature_names_out(meta['categorical']))
-    df = pd.concat([df[meta['numeric']], category_df], axis=1)
-    print(df)
-    df = scaler.transform(df)
-    df = dim_reduction.transform(df)
-
-    predicted_label = model.predict(df).tolist()
-    print(predicted_label)
-    print("predicted_label")
-    #result = {i+1: value for i, value in enumerate(predicted_label)}
-    if -1 in predicted_label:
-        public_message('anomaly')
 
 
 @app.post("/getAnomalyData",
