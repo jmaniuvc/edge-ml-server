@@ -1,8 +1,0 @@
-fastapi
-uvicorn
-pandas
-email-validator
-python-dotenv
-joblib
-scikit-learn
-paho-mqtt==1.6.1
