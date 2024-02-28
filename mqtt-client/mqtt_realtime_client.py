@@ -52,6 +52,7 @@ def on_message(client, userdata, msg):
             url = os.getenv('GET_ANOMALY_DATA_URL')
             requests.post(url, json=msg.payload)
     if msg.topic == 'ai/model':
+        # TODO
         print("???????????????")
         dev_id = msg.payload['DEVICE_ID']
         download_resources(dev_id)

@@ -9,7 +9,7 @@ from utils.mqtt_publish import public_message
 SAVE_DIR = os.getenv('RESOURCE_PATH')
 
 
-def detect_anomaly_data(df):
+def detect_anomaly_data(df, dt):
     "inference anomaly data"
     model = load(f'{SAVE_DIR}/dbscan.pkl')
     scaler = load(f'{SAVE_DIR}/scaler.joblib')
@@ -32,4 +32,9 @@ def detect_anomaly_data(df):
     print("predicted_label")
     # result = {i+1: value for i, value in enumerate(predicted_label)}
     if -1 in predicted_label:
-        public_message('anomaly')
+        public_message({
+            "ALARM_TYPE": "DEV01",
+            "NODE_ID": "ns=2;2902915",
+            "VALUE": 0,
+            "DATE_TIME": dt
+        })
