@@ -62,15 +62,11 @@ async def get_anomaly_data(request_body:
         You can check the information of missing values \n
         Receive data verification results for selected tags\n
         - Params:\n
-            - body: \n
-                - selectedTagList
-                - contents:
-                    - columns(list)
-                    - index(list)
-                    - data(list)
+            - DEVICE_ID: str
+            - TAGS: LIst[Any]
+            - DATE_TIME: str
         - Returns:\n
-            - result: \n
-                {index: 1 or -1}
+            - result: "ok"
     """
     contents = request_body.TAGS
     dt = request_body.DATE_TIME

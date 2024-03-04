@@ -24,6 +24,7 @@ SAVE_DIR = os.getenv('RESOURCE_PATH')
 def detect_anomaly_data(df, dt):
     "inference anomaly data"
     try:
+        # TODO : Fix
         model = load(f'{SAVE_DIR}/dbscan.pkl')
         scaler = load(f'{SAVE_DIR}/scaler.joblib')
         onehot = load(f'{SAVE_DIR}/onehot_encoder.joblib')
@@ -39,7 +40,6 @@ def detect_anomaly_data(df, dt):
         df = scaler.transform(df)
         df = dim_reduction.transform(df)
         predicted_label = model.predict(df).tolist()
-        # TODO : Fix
         topic = f'{config.BASE_TOPIC}/Abnormal'
         result = {
                 "ALARM_TYPE": "ALARM",

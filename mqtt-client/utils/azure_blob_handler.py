@@ -27,6 +27,7 @@ class AzureBlobHandler:
 
     @staticmethod
     def make_save_dir(dir_path=SAVE_DIR):
+        """ Make save directory"""
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
 
@@ -48,7 +49,6 @@ class AzureBlobHandler:
     def upload_file(self, file_path, container_name, blob_name):
         """ upload file """
         container_name = "container-"+container_name
-        # 컨테이너가 없으면 생성
         self.create_container(container_name)
         blob_client = self.blob_client.get_blob_client(
             container_name, blob_name
@@ -56,21 +56,22 @@ class AzureBlobHandler:
         with open(file_path, "rb") as data:
             blob_client.upload_blob(data, overwrite=True)
 
-    def download_files(self, file_path, container_name, blob_name):
-        """ load file """
-        container_name = "container-"+container_name
-        container_client = self.get_container_client
-        blob_list = container_client.list_blobs()
+    # def download_files(self, file_path, container_name, blob_name):
+    #     """ load file """
+    #     container_name = "container-"+container_name
+    #     container_client = self.get_container_client
+    #     blob_list = container_client.list_blobs()
 
-        for blob in blob_list:
-            print(f"Downloading blob file: {blob.name}")
-            blob_client = self.blob_client.get_blob_client(
-                container_name, blob.name
-            )
-            with open(os.path.join(SAVE_DIR, blob.name), "wb") as download_file:
-                download_file.write(blob_client.download_blob().readall())
+    #     for blob in blob_list:
+    #         print(f"Downloading blob file: {blob.name}")
+    #         blob_client = self.blob_client.get_blob_client(
+    #             container_name, blob.name
+    #         )
+    #         with open(os.path.join(SAVE_DIR, blob.name), "wb") as f:
+    #             f.write(blob_client.download_blob().readall())
 
     def get_container_client(self, container_name):
+        """ Get container client """
         container_name = "container-"+str(container_name)
         container_client = self.blob_client.get_container_client(
             container_name
@@ -78,6 +79,7 @@ class AzureBlobHandler:
         return container_client
 
     def get_blob_list(self, container_name):
+        """ Get blob list """
         container_client = self.get_container_client(container_name)
         blob_list = container_client.list_blobs()
 
