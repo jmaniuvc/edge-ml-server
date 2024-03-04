@@ -19,7 +19,8 @@ from fastapi.responses import JSONResponse
 
 from utils.inference import detect_anomaly_data
 from pydantic_models.schemas.realtime_data_schema import RealTimeRequestBody
-from pydantic_models.examples.realtime_data_example import realtime_data_exam
+from pydantic_models.examples.realtime_data_example import (
+    realtime_data_exam as realtime_ex)
 
 
 DESCRIPTION = """
@@ -56,7 +57,7 @@ SAVE_DIR = os.getenv('RESOURCE_PATH')
           name='Get Real-Time Data')
 async def get_anomaly_data(request_body:
                            Annotated[RealTimeRequestBody,
-                                     Body(openapi_examples=realtime_data_exam)]):
+                                     Body(openapi_examples=realtime_ex)]):
     """
         You can check the information of missing values \n
         Receive data verification results for selected tags\n
@@ -78,7 +79,7 @@ async def get_anomaly_data(request_body:
         df.fillna(0, inplace=True)
         df = df.drop(labels='NODE_ID', axis=1)
         if detect_anomaly_data(df, dt) is None:
-            raise Exception()
+            raise Exception()  # pylint: disable=broad-exception-raised
 
         return {'result': "ok"}
 

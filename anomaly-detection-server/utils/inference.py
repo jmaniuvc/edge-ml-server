@@ -5,7 +5,7 @@ This is a module that publishes messages to the broker.
 """
 
 __author__ = "jmaniuvc@uvc.co.kr"
-__copyright__ = "Copyright 2023, NT Team"
+__copyright__ = "Copyright 2024, NT Team"
 
 import os
 import json

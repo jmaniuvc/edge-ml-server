@@ -9,12 +9,13 @@ __copyright__ = "Copyright 2023, NT Team"
 
 import os
 import json
+import logging
 import requests
 import paho.mqtt.client as mqtt
 from utils.resources_handler import download_resources, validate_resources
-import config
 from dotenv import load_dotenv
-import logging
+
+import config
 
 
 load_dotenv()
@@ -36,7 +37,7 @@ def connect_mqtt(task_id) -> mqtt:
     return client
 
 
-def on_connect(client, userdata, flags, rc):
+def on_connect(client, _, __, ___):
     """
     Callback for server connection.
     """
@@ -44,21 +45,20 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe(f'{config.BASE_TOPIC}/deployModel')
 
 
-def on_message(client, userdata, msg):
+def on_message(_, __, msg):
     """
     Callback function for message receipt.
     """
     msg.payload = json.loads(msg.payload.decode("utf-8").strip('"'))
     if msg.topic == f'{config.BASE_TOPIC}/deployModel':
         # TODO
-        logging.warning("???????????????")
         dev_id = msg.payload['DEVICE_ID']
         download_resources(dev_id)
 
     if msg.topic == 'edge/data':
         if validate_resources():
             url = os.getenv('GET_ANOMALY_DATA_URL')
-            requests.post(url, json=msg.payload)
+            requests.post(url, json=msg.payload, timeout=30)
 
 
 def main():
@@ -74,8 +74,7 @@ def main():
             client.loop_forever()
         except KeyboardInterrupt:
             break
-        except Exception as e:
-            logging.warning(os.getcwd())
+        except Exception as e:  # pylint: disable=broad-except
             logging.warning(e)
 
 
