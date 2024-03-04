@@ -1,6 +1,17 @@
+#!/usr/bin/env python3
+
+"""
+This is a module that Edge Data.
+"""
+
+__author__ = "jmaniuvc@uvc.co.kr"
+__copyright__ = "Copyright 2023, NT Team"
+
+
 import os
-import uvicorn
 from typing import Annotated
+import logging
+import uvicorn
 import pandas as pd
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request, Body
@@ -9,7 +20,6 @@ from fastapi.responses import JSONResponse
 from utils.inference import detect_anomaly_data
 from pydantic_models.schemas.realtime_data_schema import RealTimeRequestBody
 from pydantic_models.examples.realtime_data_example import realtime_data_exam
-from exception.base_exception import InvalidDataException
 
 
 DESCRIPTION = """
@@ -62,16 +72,18 @@ async def get_anomaly_data(request_body:
                 {index: 1 or -1}
     """
     contents = request_body.TAGS
-
+    dt = request_body.DATE_TIME
     try:
         df = pd.DataFrame(contents)
         df.fillna(0, inplace=True)
-        result = detect_anomaly_data(df)
+        df = df.drop(labels='NODE_ID', axis=1)
+        if detect_anomaly_data(df, dt) is None:
+            raise Exception()
 
         return {'result': "ok"}
 
-    except Exception as err:
-        raise InvalidDataException() from err
+    except Exception as err:  # pylint: disable=broad-except
+        logging.warning("%s", err)
 
 
 @app.exception_handler(Exception)
@@ -87,4 +99,5 @@ async def global_exception_handler(_: Request, __: Exception):
 
 if __name__ == "__main__":
     # TODO Edge Config GateWay Config API 호출
-    uvicorn.run("anomaly_detection_server:app", host="0.0.0.0", port=5005, reload=True)
+    uvicorn.run(
+        "anomaly_detection_server:app", host="0.0.0.0", port=5005, reload=True)

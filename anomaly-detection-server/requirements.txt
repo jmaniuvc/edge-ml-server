@@ -4,5 +4,5 @@ pandas
 email-validator
 python-dotenv
 joblib
-scikit-learn
+scikit-learn==1.4.0
 paho-mqtt==1.6.1

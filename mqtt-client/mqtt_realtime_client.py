@@ -14,9 +14,11 @@ import paho.mqtt.client as mqtt
 from utils.resources_handler import download_resources, validate_resources
 import config
 from dotenv import load_dotenv
+import logging
 
 
 load_dotenv()
+
 
 # mqtt functions
 def publish_message(topic, context):
@@ -39,7 +41,7 @@ def on_connect(client, userdata, flags, rc):
     Callback for server connection.
     """
     client.subscribe("edge/data")
-    client.subscribe("ai/model")
+    client.subscribe(f'{config.BASE_TOPIC}/deployModel')
 
 
 def on_message(client, userdata, msg):
@@ -47,15 +49,16 @@ def on_message(client, userdata, msg):
     Callback function for message receipt.
     """
     msg.payload = json.loads(msg.payload.decode("utf-8").strip('"'))
+    if msg.topic == f'{config.BASE_TOPIC}/deployModel':
+        # TODO
+        logging.warning("???????????????")
+        dev_id = msg.payload['DEVICE_ID']
+        download_resources(dev_id)
+
     if msg.topic == 'edge/data':
         if validate_resources():
             url = os.getenv('GET_ANOMALY_DATA_URL')
             requests.post(url, json=msg.payload)
-    if msg.topic == 'ai/model':
-        # TODO
-        print("???????????????")
-        dev_id = msg.payload['DEVICE_ID']
-        download_resources(dev_id)
 
 
 def main():
@@ -72,7 +75,8 @@ def main():
         except KeyboardInterrupt:
             break
         except Exception as e:
-            print(e)
+            logging.warning(os.getcwd())
+            logging.warning(e)
 
 
 if __name__ == "__main__":

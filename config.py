@@ -1,7 +1,9 @@
 ADDRESS = "220.90.135.16"
 PORT = 1883
 TASK_ID = "1"
-
+GROUP_ID = "68"
+EDGE_ID = "UVC_01"
+BASE_TOPIC = f'{GROUP_ID}/{EDGE_ID}'
 config = {
     "GROUP_ID": "5",
     "MQTT_SERVER_IP": "192.168.0.1",

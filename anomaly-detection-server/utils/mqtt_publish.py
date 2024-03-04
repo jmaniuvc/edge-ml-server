@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
 
 """
-This is a module that Edge Data.
+This is a module that publishes messages to the broker.
 """
 
 __author__ = "jmaniuvc@uvc.co.kr"
 __copyright__ = "Copyright 2023, NT Team"
 
-import paho.mqtt.client as mqtt
+from paho.mqtt import client as mqtt
 import config
-
-TOPIC = 'ai/data'
 
 
 def connect_mqtt(task_id) -> mqtt:
@@ -21,7 +19,7 @@ def connect_mqtt(task_id) -> mqtt:
     return client
 
 
-def public_message(context):
+def public_message(topic, context):
     """
     Main function to create the MQTT client and start the loop.
     """
@@ -30,12 +28,12 @@ def public_message(context):
         client.connect(config.ADDRESS, config.PORT, 60)
         client.loop_start()
         client = connect_mqtt(config.TASK_ID)
-        client.publish(TOPIC, context)
+        client.publish(topic, context)
         client.loop_stop()
 
-    except Exception as e:
-        print(e)
+    except Exception as err:  # pylint: disable=broad-except
+        print(err)
 
 
 if __name__ == "__main__":
-    public_message()
+    public_message("ai/data", "init")
