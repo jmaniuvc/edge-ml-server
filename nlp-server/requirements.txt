@@ -2,3 +2,6 @@ fastapi
 uvicorn
 openai
 langchain
+python-dotenv
+langchain-openai
+email-validator

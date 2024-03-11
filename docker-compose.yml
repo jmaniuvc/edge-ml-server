@@ -1,0 +1,11 @@
+version: '0.1'
+services:
+  fastapi:
+    build: ./nlp-server  # FastAPI 앱이 있는 디렉토리
+    environment:  # 환경 변수 설정
+      - FASTAPI_HOST=${FASTAPI_HOST}
+      - FASTAPI_PORT=${FASTAPI_PORT}
+      - RESOURCE_PATH=${RESOURCE_PATH}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    ports:
+      - ${FASTAPI_PORT}:${FASTAPI_PORT}  # FastAPI 앱 포트 매핑

@@ -1,29 +1,39 @@
-from fastapi import FastAPI, Request, Body
-from fastapi.responses import JSONResponse, HTMLResponse
-import uvicorn
-import json
+# !/usr/bin/env python3
+"""
+This is a module that does data NLP Server.
+"""
+
+__author__ = "jmaniuvc@uvc.co.kr"
+__copyright__ = "Copyright 2024, AI Team"
+
 from typing import Annotated
+from fastapi import FastAPI, Request, Body
+from fastapi.responses import JSONResponse
+import uvicorn
 from dotenv import load_dotenv
-from fastapi.templating import Jinja2Templates
-from langchain_openai import ChatOpenAI
-from langchain.prompts import PromptTemplate
-from pydantic_models.schemas.rpa_recipe_schema import RPARecipeRequestBody
+from pydantic_models.schemas.rpa_recipe_schema import (
+    RPARecipeRequestBody, RPARecipeResponseBody)
 from pydantic_models.examples.rpa_recipe_example import rpa_recipe_exam
+from utils.manage_model import get_chatgpt_model, get_prompt
+from utils.validate_api import ValidationRecipe
 
 load_dotenv()
+
 DESCRIPTION = """
-The ML API of Flexing CPS helps you do awesome stuff. 🚀
+NLP Server helps you do awesome stuff. 🚀
+
+## RPA
 
 You will be able to:
 
-## Real-Time Detection
+* **Text to Recipe**
+* ~ing
+
 """
-app = FastAPI()
-templates = Jinja2Templates(directory="templates")
 app = FastAPI(
-        title="CPS ML Server",
+        title="NLP Server",
         description=DESCRIPTION,
-        summary="Flexing CPS Machine Learning Server",
+        # summary="NLP Server",
         version="0.0.1",
         contact={
             "name": "Jeong Min Lee",
@@ -36,33 +46,23 @@ app = FastAPI(
         },
     )
 
-with open("prompt2.txt", "r", encoding='utf-8') as f:
-    text = f.read()
 
-llm = ChatOpenAI(temperature=0,               # 창의성 (0.0 ~ 2.0)
-                 max_tokens=2800,             # 최대 토큰수
-                 model_name='gpt-3.5-turbo')  # 모델명
+@app.post("/getFreeTextRecipe", tags=['RPA'])
+def get_freetext_rpa_receipe(request: Annotated[
+                                RPARecipeRequestBody,
+                                Body(openapi_examples=rpa_recipe_exam)
+                            ]) -> RPARecipeResponseBody:
+    """ Free-text to RPA recipe """
 
-
-@app.get("/", response_class=HTMLResponse)
-def read_root(request: Request):
-    return templates.TemplateResponse("home.html", {"request": request})
-
-prompt = PromptTemplate.from_template(text)
-
-@app.post("/getFreeTextRPARecipe")
-def get_freetext_rpa_receipe(request:
-                             Annotated[RPARecipeRequestBody,
-                                       Body(openapi_examples=rpa_recipe_exam)]):
-    # question = "에어압력계의 에어 누출이 없고 에어압력 지침이 4~6Mpa인지 확인하고 안된다면 에어 레귤레이터의 점검/수리/교체를 해야해."
-    recipe_name = request.data.recipeName
-    msg = request.data.msg
-    print(type(msg))
-    prompt_q = prompt.format(text=msg)
-    result = llm.predict(prompt_q)
-    print(result)
-    result = json.loads(result)
-    return result
+    prompt = get_prompt()
+    model = get_chatgpt_model()
+    msg = request.msg
+    tag_map = request.tagIdsAndNames
+    prompt_q = prompt.format(text=msg, tag_map=tag_map)
+    result = model.predict(prompt_q)
+    validation = ValidationRecipe(result)
+    recipe = validation.get_recipe()
+    return recipe
 
 
 @app.exception_handler(Exception)
@@ -77,5 +77,4 @@ async def global_exception_handler(_: Request, __: Exception):
 
 
 if __name__ == "__main__":
-    # TODO Edge Config GateWay Config API 호출
     uvicorn.run("app:app", host="0.0.0.0", port=5004, reload=True)
